@@ -509,7 +509,7 @@
 					return;
 				var scrollEL = document.getElementById(opts.scrollContainer),
 					sl = scrollEL.getBoundingClientRect().left,
-					sr = scrollEL.getBoundingClientRect().left + scorllEL.offsetWidth,
+					sr = scrollEL.getBoundingClientRect().left + scrollEL.offsetWidth,
 					gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
 				if (gr > sr) {
 					_timeScorll(function () {
