@@ -215,7 +215,6 @@
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
-			container: null,
 			scrollContainer: null
 		};
 
@@ -503,40 +502,23 @@
 				evt.preventDefault();
 			}
 
-			//判断是否在制定容器内
-			function _inContainer(tEvt) {
-
-				if (!(opts && opts.container))
-					return true;
-				var conEl = document.getElementById(opts.container);
-				if (!conEl)
-					return true;
-				//容器坐标
-				var cl = conEl.getBoundingClientRect().left, cr = conEl.getBoundingClientRect().right;
-				//拖动对象坐标
-				var gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
-				//鼠标坐标
-				var screenX = tEvt.screenX, screenY = tEvt.screenY;
-
-				return true;
-			}
 
 			//扩展滚动条区域自动滚动
 			function _aScroll() {
 				if (!(opts && opts.scrollContainer))
 					return;
-				var scorllEL = document.getElementById(opts.scrollContainer),
-					sl = scorllEL.getBoundingClientRect().left,
-					sr = scorllEL.getBoundingClientRect().left + scorllEL.offsetWidth,
+				var scrollEL = document.getElementById(opts.scrollContainer),
+					sl = scrollEL.getBoundingClientRect().left,
+					sr = scrollEL.getBoundingClientRect().left + scorllEL.offsetWidth,
 					gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
 				if (gr > sr) {
 					_timeScorll(function () {
-						scorllEL.scrollLeft = scorllEL.scrollLeft + 1;
+						scrollEL.scrollLeft = scrollEL.scrollLeft + 1;
 					});
 				}
 				if (gl < sl)
 					_timeScorll(function () {
-						scorllEL.scrollLeft = scorllEL.scrollLeft - 1;
+						scrollEL.scrollLeft = scrollEL.scrollLeft - 1;
 					});
 
 				function _timeScorll(f) {
