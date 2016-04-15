@@ -1,6 +1,6 @@
 /**!
  * Sortable
- * @author	RubaXa   <trash@rubaxa.org>
+ * @author    RubaXa   <trash@rubaxa.org>
  * @license MIT
  */
 
@@ -23,10 +23,10 @@
 	}
 })(function () {
 	"use strict";
-	
+
 	if (typeof window == "undefined" || typeof window.document == "undefined") {
-		return function() {
-			throw new Error( "Sortable.js requires a window with a document" );
+		return function () {
+			throw new Error("Sortable.js requires a window with a document");
 		}
 	}
 
@@ -94,7 +94,7 @@
 
 					vx,
 					vy
-				;
+					;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -168,8 +168,7 @@
 
 			options.groups = ' ' + group.name + (group.put.join ? ' ' + group.put.join(' ') : '') + ' ';
 		}
-	;
-
+		;
 
 
 	/**
@@ -215,7 +214,9 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			container: null,
+			scrollContainer: null
 		};
 
 
@@ -265,7 +266,7 @@
 				originalTarget = target,
 				filter = options.filter;
 			// don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
-			if(dragEl){
+			if (dragEl) {
 				return;
 			}
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
@@ -459,7 +460,7 @@
 
 						target = parent; // store last element
 					}
-					/* jshint boss:true */
+						/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -470,7 +471,10 @@
 		},
 
 
-		_onTouchMove: function (/**TouchEvent*/evt) {
+		_onTouchMove: function (/**TouchEvent*/evt, dx) {
+
+			var opts = this.options;
+
 			if (tapEvt) {
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active) {
@@ -493,8 +497,59 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
+				//拖拽时联动滚动条
+				_aScroll();
+
 				evt.preventDefault();
 			}
+
+			//判断是否在制定容器内
+			function _inContainer(tEvt) {
+
+				if (!(opts && opts.container))
+					return true;
+				var conEl = document.getElementById(opts.container);
+				if (!conEl)
+					return true;
+				//容器坐标
+				var cl = conEl.getBoundingClientRect().left, cr = conEl.getBoundingClientRect().right;
+				//拖动对象坐标
+				var gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
+				//鼠标坐标
+				var screenX = tEvt.screenX, screenY = tEvt.screenY;
+
+				return true;
+			}
+
+			//扩展滚动条区域自动滚动
+			function _aScroll() {
+				if (!(opts && opts.scrollContainer))
+					return;
+				var scorllEL = document.getElementById(opts.scrollContainer),
+					sl = scorllEL.getBoundingClientRect().left,
+					sr = scorllEL.getBoundingClientRect().left + scorllEL.offsetWidth,
+					gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
+				if (gr > sr) {
+					_timeScorll(function () {
+						scorllEL.scrollLeft = scorllEL.scrollLeft + 1;
+					});
+				}
+				if (gl < sl)
+					_timeScorll(function () {
+						scorllEL.scrollLeft = scorllEL.scrollLeft - 1;
+					});
+
+				function _timeScorll(f) {
+					var i = 0;
+					var sTimer = setInterval(function () {
+						i++;
+						f();
+						if (i == 20)
+							clearInterval(sTimer);
+					}, 30);
+				};
+			}
+
 		},
 
 		_appendGhost: function () {
@@ -585,8 +640,8 @@
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
+						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+						: activeGroup.pull && groupPut && (
 						(activeGroup.name === group.name) || // by Name
 						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
 					)
@@ -661,7 +716,7 @@
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
-					;
+						;
 
 					if (moveVector !== false) {
 						_silent = true;
@@ -821,29 +876,29 @@
 			this._nulling();
 		},
 
-		_nulling: function() {
+		_nulling: function () {
 			// Nulling
 			rootEl =
-			dragEl =
-			parentEl =
-			ghostEl =
-			nextEl =
-			cloneEl =
+				dragEl =
+					parentEl =
+						ghostEl =
+							nextEl =
+								cloneEl =
 
-			scrollEl =
-			scrollParentEl =
+									scrollEl =
+										scrollParentEl =
 
-			tapEvt =
-			touchEvt =
+											tapEvt =
+												touchEvt =
 
-			moved =
-			newIndex =
+													moved =
+														newIndex =
 
-			lastEl =
-			lastCSS =
+															lastEl =
+																lastCSS =
 
-			activeGroup =
-			Sortable.active = null;
+																	activeGroup =
+																		Sortable.active = null;
 		},
 
 		handleEvent: function (/**Event*/evt) {
@@ -1080,7 +1135,6 @@
 	}
 
 
-
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
 		var evt = document.createEvent('Event'),
 			options = (sortable || rootEl[expando]).options,
@@ -1143,7 +1197,7 @@
 	/** @returns {HTMLElement|false} */
 	function _ghostIsLast(el, evt) {
 		var lastEl = el.lastElementChild,
-				rect = lastEl.getBoundingClientRect();
+			rect = lastEl.getBoundingClientRect();
 
 		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.right + rect.width) > 5)) && lastEl; // min delta
 	}
@@ -1183,7 +1237,7 @@
 
 		while (el && (el = el.previousElementSibling)) {
 			if (el.nodeName.toUpperCase() !== 'TEMPLATE'
-					&& _matches(el, selector)) {
+				&& _matches(el, selector)) {
 				index++;
 			}
 		}
