@@ -52,6 +52,7 @@
 
 		tapEvt,
 		touchEvt,
+		startEvt,
 
 		moved,
 
@@ -99,14 +100,20 @@
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
-					scrollParentEl = rootEl;
+					//scrollParentEl = rootEl;
 
 					if (scrollEl === true) {
 						scrollEl = rootEl;
 
+						var yx = abs(startEvt.clientX - evt.clientX), yy = abs(startEvt.clientY - evt.clientY);
+
+						//设置一个10像素的移动误差
+						if (yx % 10 == 0 || yy % 10 == 0)
+							startEvt = evt;
+
 						do {
-							if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
-								(scrollEl.offsetHeight < scrollEl.scrollHeight)
+							if ((yx > yy && scrollEl.offsetWidth < scrollEl.scrollWidth) ||
+								((yx < yy && scrollEl.offsetHeight < scrollEl.scrollHeight))
 							) {
 								break;
 							}
@@ -324,6 +331,7 @@
 
 			if (target && !dragEl && (target.parentNode === el)) {
 				tapEvt = evt;
+				startEvt = evt;
 
 				rootEl = el;
 				dragEl = target;
@@ -496,40 +504,7 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
-				//拖拽时联动滚动条
-				_aScroll();
-
 				evt.preventDefault();
-			}
-
-
-			//扩展滚动条区域自动滚动
-			function _aScroll() {
-				if (!(opts && opts.scrollContainer))
-					return;
-				var scrollEL = document.getElementById(opts.scrollContainer),
-					sl = scrollEL.getBoundingClientRect().left,
-					sr = scrollEL.getBoundingClientRect().left + scrollEL.offsetWidth,
-					gl = ghostEl.getBoundingClientRect().left, gr = ghostEl.getBoundingClientRect().right;
-				if (gr > sr) {
-					_timeScorll(function () {
-						scrollEL.scrollLeft = scrollEL.scrollLeft + 1;
-					});
-				}
-				if (gl < sl)
-					_timeScorll(function () {
-						scrollEL.scrollLeft = scrollEL.scrollLeft - 1;
-					});
-
-				function _timeScorll(f) {
-					var i = 0;
-					var sTimer = setInterval(function () {
-						i++;
-						f();
-						if (i == 20)
-							clearInterval(sTimer);
-					}, 30);
-				};
 			}
 
 		},
