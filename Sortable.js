@@ -122,6 +122,8 @@
 					}
 				}
 
+				!scrollEl&&(scrollEl=autoScroll.el);
+
 				if (scrollEl) {
 					el = scrollEl;
 					rect = scrollEl.getBoundingClientRect();
