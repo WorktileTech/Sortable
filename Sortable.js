@@ -224,7 +224,8 @@
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
-			scrollContainer: null
+			scrollContainer: null,
+			allowTransform:true
 		};
 
 
@@ -494,17 +495,24 @@
 				this._appendGhost();
 
 				var touch = evt.touches ? evt.touches[0] : evt,
+					originalTouchEvt = touchEvt || tapEvt,
 					dx = touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				moved = true;
 				touchEvt = touch;
-
-				_css(ghostEl, 'webkitTransform', translate3d);
-				_css(ghostEl, 'mozTransform', translate3d);
-				_css(ghostEl, 'msTransform', translate3d);
-				_css(ghostEl, 'transform', translate3d);
+				if(opts.allowTransform){
+					_css(ghostEl, 'webkitTransform', translate3d);
+					_css(ghostEl, 'mozTransform', translate3d);
+					_css(ghostEl, 'msTransform', translate3d);
+					_css(ghostEl, 'transform', translate3d);
+				}else{
+					var top = parseInt(_css(ghostEl,"top"));
+					var left = parseInt(_css(ghostEl,"left"));
+					_css(ghostEl, 'top', top + touch.clientY - originalTouchEvt.clientY);
+					_css(ghostEl, 'left', left + touch.clientX - originalTouchEvt.clientX);
+				}
 
 				evt.preventDefault();
 			}
