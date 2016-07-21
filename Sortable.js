@@ -225,7 +225,7 @@
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
 			scrollContainer: null,
-			allowTransform:true
+			allowTransform: true
 		};
 
 
@@ -603,6 +603,12 @@
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
+			//如果拖动的目标区域 accept 设置了, 当前拖拽元素不满足,直接返回
+			if (activeGroup && activeGroup.name === group.name
+				&& evt.rootEl[expando].options.accept
+				&& !_matches(dragEl, evt.rootEl[expando].options.accept)) {
+				return;
+			}
 			moved = true;
 
 			if (activeGroup && !options.disabled &&
