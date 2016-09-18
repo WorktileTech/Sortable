@@ -605,7 +605,7 @@
 
 			//如果拖动的目标区域 accept 设置了, 当前拖拽元素不满足,直接返回
 			if (activeGroup && activeGroup.name === group.name
-				&& evt.rootEl[expando].options.accept
+				&& evt.rootEl && evt.rootEl[expando] && evt.rootEl[expando].options.accept
 				&& !_matches(dragEl, evt.rootEl[expando].options.accept)) {
 				return;
 			}
