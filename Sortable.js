@@ -122,7 +122,7 @@
 					}
 				}
 
-				!scrollEl&&(scrollEl=autoScroll.el);
+				!scrollEl && (scrollEl = autoScroll.el);
 
 				if (scrollEl) {
 					el = scrollEl;
@@ -428,6 +428,9 @@
 				// Apply effect
 				_toggleClass(dragEl, this.options.ghostClass, true);
 
+				//拖拽开始设置不可以选择文本
+				this._userSelect(rootEl, 'none');
+
 				Sortable.active = this;
 
 				// Drag start event
@@ -502,14 +505,14 @@
 
 				moved = true;
 				touchEvt = touch;
-				if(opts.allowTransform){
+				if (opts.allowTransform) {
 					_css(ghostEl, 'webkitTransform', translate3d);
 					_css(ghostEl, 'mozTransform', translate3d);
 					_css(ghostEl, 'msTransform', translate3d);
 					_css(ghostEl, 'transform', translate3d);
-				}else{
-					var top = parseInt(_css(ghostEl,"top"));
-					var left = parseInt(_css(ghostEl,"left"));
+				} else {
+					var top = parseInt(_css(ghostEl, "top"));
+					var left = parseInt(_css(ghostEl, "left"));
 					_css(ghostEl, 'top', top + touch.clientY - originalTouchEvt.clientY);
 					_css(ghostEl, 'left', left + touch.clientX - originalTouchEvt.clientX);
 				}
@@ -765,6 +768,15 @@
 			_off(ownerDocument, 'touchcancel', this._onDrop);
 		},
 
+		_userSelect: function (el, value) {
+			_css(el, 'webkitUserSelect', value);
+			_css(el, 'khtmlUserSelect', value);
+			_css(el, 'mozUserSelect', value);
+			_css(el, 'msUserSelect', value);
+			_css(el, 'userSelect', value);
+		},
+
+
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
@@ -801,6 +813,9 @@
 					// Remove class's
 					_toggleClass(dragEl, this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
+
+					//拖拽结束可以选择文本
+					this._userSelect(rootEl, 'text');
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl, options.draggable);
